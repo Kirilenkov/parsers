@@ -1,9 +1,9 @@
 import requests
 from bs4 import BeautifulSoup as bs
 import os
+from multiprocessing import Pool
 from time import time
-PATH = 'C:/Users/Kirill/Desktop/Foods/'
-
+PATH = 'C:/Users/Kirill/Desktop/Food/'
 pars_headers = {'accept': '*/*',
            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                          ' AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -19,13 +19,12 @@ def time_it_decorator(func):
     return wrapper
 
 
-@time_it_decorator
 def food_parser(url, headers):
     titles = []
     sess = requests.Session()
     request = sess.get(url, headers=headers)
     if request.status_code == 200:
-        print('LOADED')
+        print('[LOADED] {:s}'.format(url))
         soup = bs(request.content, 'html.parser')
         items = soup.find_all('h3', class_='horizontal-tile__item-title')
         for item in items:
@@ -33,22 +32,27 @@ def food_parser(url, headers):
                 recipe_title = tag.text.strip()
                 titles.append(recipe_title)
     else:
-        print('LOADING ERROR')
+        print('[LOADING ERROR on] {:s}'.format(url))
     return titles
+
+
+def write_to_txt(snippet):
+    with open('desserts.txt', 'a', encoding='utf-8') as f:
+        for titles in snippet:
+            f.writelines(titles)
+            f.write('\n')
+
+
+def core(pars_url):
+    write_to_txt(food_parser(pars_url, pars_headers))
 
 
 @time_it_decorator
 def main():
     os.chdir(PATH)
-    common_titles = []
-    for i in range(10):
-        print(f'Загружается страница № {i + 1}')
-        pars_url = f'https://eda.ru/recepty/osnovnye-blyuda/russkaya-kuhnya?page={i + 1}'
-        common_titles.append(food_parser(pars_url, pars_headers))
-    with open('recipe_list.txt', 'w', encoding='utf-8') as f:
-        for titles in common_titles:
-            f.writelines('\n'.join(titles))
-            f.write('\n')
+    queue = [f'https://eda.ru/recepty/vypechka-deserty?page={n}' for n in range(1, 715, 1)]
+    with Pool(40) as p:
+        p.map(core, queue)
 
 
 if __name__ == '__main__':

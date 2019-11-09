@@ -24,7 +24,7 @@ def food_parser(url, headers):
     sess = requests.Session()
     request = sess.get(url, headers=headers)
     if request.status_code == 200:
-        print('[LOADED] {:s}'.format(url))
+        print('{:s} [LOADED]'.format(url))
         soup = bs(request.content, 'html.parser')
         items = soup.find_all('h3', class_='horizontal-tile__item-title')
         for item in items:
@@ -32,7 +32,7 @@ def food_parser(url, headers):
                 recipe_title = tag.text.strip()
                 titles.append(recipe_title)
     else:
-        print('[LOADING ERROR on] {:s}'.format(url))
+        print('{:s} [LOADING ERROR]'.format(url))
     return titles
 
 

@@ -4,7 +4,7 @@ import datetime as dt
 from bs4 import BeautifulSoup as bs
 import os
 from time import time
-PATH = 'C:/Users/Researcher/Desktop/Raw_specifications/'
+PATH = '/Users/kirill/results'
 pars_headers = {'accept': '*/*',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -89,7 +89,7 @@ def core(pars_url):
 @time_it_decorator
 def main():
     os.chdir(PATH)
-    core('link')
+    core('https://www.dns-shop.ru/product/8bf0324586723332/65-164-sm-televizor-led-lg-65sm8200pla-cernyj/characteristics/')
 
 
 if __name__ == '__main__':
